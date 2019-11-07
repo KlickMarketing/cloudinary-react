@@ -1,14 +1,14 @@
-import React from "react";
-import PropTypes from "prop-types";
-import { Cloudinary, Transformation, Util } from "cloudinary-core";
-import CloudinaryComponent from "../CloudinaryComponent";
+import React from 'react';
+import PropTypes from 'prop-types';
+import { Cloudinary, Transformation, Util } from 'cloudinary-core';
+import CloudinaryComponent from '../CloudinaryComponent';
 
 const DEFAULT_POSTER_OPTIONS = {
-  format: "jpg",
-  resource_type: "video"
+  format: 'jpg',
+  resource_type: 'video'
 };
 
-console.log("KLICK VERSION!");
+console.log('KLICK VERSION!')
 /**
  * A component representing a Cloudinary served video
  */
@@ -19,14 +19,9 @@ class Video extends CloudinaryComponent {
   }
 
   render() {
-    let {
-      publicId,
-      poster,
-      sourceTypes,
-      fallback,
-      sourceTransformation: sourceTransformations,
-      ...options
-    } = Object.assign({}, this.getContext(), this.props);
+    let { publicId, poster, sourceTypes, fallback, sourceTransformation: sourceTransformations, ...options } = Object.assign({},
+      this.getContext(),
+      this.props);
     sourceTransformations = sourceTransformations || {};
     sourceTypes = sourceTypes || Cloudinary.DEFAULT_VIDEO_PARAMS.source_types;
     options = CloudinaryComponent.normalizeOptions(options, {});
@@ -35,14 +30,8 @@ class Video extends CloudinaryComponent {
     let tagAttributes = Transformation.new(options).toHtmlAttributes();
     let childTransformations = this.getTransformation(options);
     if (Util.isPlainObject(poster)) {
-      let defaults =
-        poster.publicId !== undefined && poster.publicId !== null
-          ? Cloudinary.DEFAULT_IMAGE_PARAMS
-          : DEFAULT_POSTER_OPTIONS;
-      poster = cld.url(
-        poster.publicId || publicId,
-        Util.defaults({}, Util.withSnakeCaseKeys(poster), defaults)
-      );
+      let defaults = poster.publicId !== undefined && poster.publicId !== null ? Cloudinary.DEFAULT_IMAGE_PARAMS : DEFAULT_POSTER_OPTIONS;
+      poster = cld.url(poster.publicId || publicId, Util.defaults({}, Util.withSnakeCaseKeys(poster), defaults));
     }
     if (!Util.isEmpty(poster)) {
       tagAttributes.poster = poster;
@@ -54,29 +43,20 @@ class Video extends CloudinaryComponent {
     if (Util.isArray(sourceTypes)) {
       sources = sourceTypes.map(srcType => {
         let sourceTransformation = sourceTransformations[srcType] || {};
-        let src = cld.url(
-          publicId,
-          Util.defaults({}, sourceTransformation, childTransformations, {
-            resource_type: "video",
-            format: srcType
-          })
-        );
-        let mimeType = "video/" + (srcType === "ogv" ? "ogg" : srcType);
+        let src = cld.url(publicId, Util.defaults({}, sourceTransformation, childTransformations, { resource_type: 'video', format: srcType }));
+        let mimeType = 'video/' + (srcType === 'ogv' ? 'ogg' : srcType);
         return <source key={mimeType} src={src} type={mimeType} />;
-      });
+      }
+      );
     } else {
       let sourceTransformation = sourceTransformations[sourceTypes] || {};
-      tagAttributes.src = cld.url(
-        publicId,
-        Util.defaults({}, sourceTransformation, childTransformations, {
-          resource_type: "video",
-          format: sourceTypes
-        })
-      );
+      tagAttributes.src = cld.url(publicId, Util.defaults({}, sourceTransformation, childTransformations, { resource_type: 'video', format: sourceTypes }));
     }
 
     return (
-      <video {...tagAttributes}>
+      <video
+        ref={this.props.videoRef}
+        {...tagAttributes}>
         {sources}
         {fallback}
         {this.props.children}
@@ -88,4 +68,6 @@ Video.propTypes = { publicId: PropTypes.string };
 Video.defaultProps = {};
 Video.contextTypes = CloudinaryComponent.contextTypes;
 
-export default Video;
+// export default Video;
+export default React.forwardRef((props, ref) =>
+  <Video videoRef={ref} {...props} />);
