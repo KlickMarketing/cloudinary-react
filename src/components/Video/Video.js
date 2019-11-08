@@ -8,7 +8,6 @@ const DEFAULT_POSTER_OPTIONS = {
   resource_type: 'video'
 };
 
-console.log('KLICK VERSION!')
 /**
  * A component representing a Cloudinary served video
  */
@@ -19,7 +18,7 @@ class Video extends CloudinaryComponent {
   }
 
   render() {
-    let { publicId, poster, sourceTypes, fallback, sourceTransformation: sourceTransformations, ...options } = Object.assign({},
+    let { publicId, poster, sourceTypes, fallback, sourceTransformation: sourceTransformations, videoRef, ...options } = Object.assign({},
       this.getContext(),
       this.props);
     sourceTransformations = sourceTransformations || {};
@@ -55,7 +54,7 @@ class Video extends CloudinaryComponent {
 
     return (
       <video
-        ref={this.props.videoRef}
+        ref={videoRef}
         {...tagAttributes}>
         {sources}
         {fallback}
