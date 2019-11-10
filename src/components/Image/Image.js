@@ -1,7 +1,7 @@
 import React from 'react';
-import cloudinary, {Util} from 'cloudinary-core';
+import cloudinary, { Util } from 'cloudinary-core';
 import CloudinaryComponent from '../CloudinaryComponent';
-import {debounce, firstDefined, closestAbove, requestAnimationFrame, isElement} from '../../Util';
+import { debounce, firstDefined, closestAbove, requestAnimationFrame, isElement } from '../../Util';
 
 const defaultBreakpoints = (width, steps = 100) => {
   return steps * Math.ceil(width / steps);
@@ -17,7 +17,9 @@ class Image extends CloudinaryComponent {
 
     this.state = {};
 
-    let state = {responsive: false, url: undefined, breakpoints: defaultBreakpoints};
+    this.element = this.props.imageRef || React.createRef();
+
+    let state = { responsive: false, url: undefined, breakpoints: defaultBreakpoints };
     this.state = Object.assign(state, this.prepareState(props, context));
   }
 
@@ -31,7 +33,7 @@ class Image extends CloudinaryComponent {
     if (typeof window !== "undefined") {
       windowRef = window
     }
-    return (this.element && this.element.ownerDocument) ? (this.element.ownerDocument.defaultView || windowRef) : windowRef;
+    return (this.element.current && this.element.current.ownerDocument) ? (this.element.current.ownerDocument.defaultView || windowRef) : windowRef;
   }
 
   prepareState(props = this.props, context = this.getContext()) {
@@ -72,12 +74,13 @@ class Image extends CloudinaryComponent {
   }
 
   componentDidMount() {
+    console.log(this.element)
     // now that we have a this.element, we need to calculate the URL
     this.handleResize();
   }
 
   componentWillUnmount() {
-    this.element = undefined;
+    // this.element = undefined;
     if (this.listener) {
       this.listener.cancel();
       this.window && this.window.removeEventListener('resize', this.listener);
@@ -86,6 +89,7 @@ class Image extends CloudinaryComponent {
   }
 
   componentDidUpdate(prevProps) {
+    console.log('test', this.element)
     this.setState(this.prepareState());
     if (this.state.responsive) {
       const wait = firstDefined(this.props.responsiveDebounce, this.getContext().responsiveDebounce, 100);
@@ -98,14 +102,12 @@ class Image extends CloudinaryComponent {
   }
 
   render() {
-    const {publicId, responsive, responsiveDebounce, children, ...options} =
+    const { publicId, responsive, responsiveDebounce, children, ...options } =
       CloudinaryComponent.normalizeOptions(this.props, this.getContext());
     const attributes = cloudinary.Transformation.new(options).toHtmlAttributes();
-    const {url} = this.state;
+    const { url } = this.state;
     return (
-      <img {...attributes} src={url} ref={(e) => {
-        this.element = e;
-      }}/>
+      <img {...attributes} src={url} ref={this.element} />
     );
   }
 
@@ -114,7 +116,7 @@ class Image extends CloudinaryComponent {
   findContainerWidth() {
     var containerWidth, style;
     containerWidth = 0;
-    let element = this.element;
+    let element = this.element.current;
     while (isElement((element = element != null ? element.parentNode : void 0)) && !containerWidth) {
       style = this.window ? this.window.getComputedStyle(element) : '';
       if (!/^inline/.test(style.display)) {
@@ -190,14 +192,14 @@ class Image extends CloudinaryComponent {
       let containerWidth = this.findContainerWidth();
       if (containerWidth !== 0) {
         if (/w_auto:breakpoints/.test(resultUrl)) {
-          requiredWidth = this.maxWidth(containerWidth, this.element);
+          requiredWidth = this.maxWidth(containerWidth, this.element.current);
           resultUrl = resultUrl.replace(/w_auto:breakpoints([_0-9]*)(:[0-9]+)?/,
             "w_auto:breakpoints$1:" + requiredWidth);
         } else {
           match = /w_auto(:(\d+))?/.exec(resultUrl);
           if (match) {
             requiredWidth = this.applyBreakpoints(containerWidth, match[2], options);
-            requiredWidth = this.maxWidth(requiredWidth, this.element);
+            requiredWidth = this.maxWidth(requiredWidth, this.element.current);
             resultUrl = resultUrl.replace(/w_auto[^,\/]*/g, "w_" + requiredWidth);
           }
         }
@@ -205,7 +207,7 @@ class Image extends CloudinaryComponent {
         resultUrl = "";
       }
     }
-    return {url: resultUrl, width: requiredWidth};
+    return { url: resultUrl, width: requiredWidth };
   }
 }
 
