@@ -214,4 +214,5 @@ class Image extends CloudinaryComponent {
 Image.defaultProps = {};
 Image.propTypes = CloudinaryComponent.propTypes;
 
-export default Image;
+export default React.forwardRef((props, ref) =>
+  <Image imageRef={ref} {...props} />);
