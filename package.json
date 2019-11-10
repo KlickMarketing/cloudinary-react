@@ -11,8 +11,7 @@
     "compile": "node_modules/.bin/babel -v --copy-files src -d lib ",
     "dist": "node_modules/.bin/webpack",
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook",
-    "prepare": "npm run compile"
+    "build-storybook": "build-storybook"
   },
   "repository": {
     "type": "git",

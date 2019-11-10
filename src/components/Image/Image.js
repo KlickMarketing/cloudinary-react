@@ -74,7 +74,6 @@ class Image extends CloudinaryComponent {
   }
 
   componentDidMount() {
-    console.log(this.element)
     // now that we have a this.element, we need to calculate the URL
     this.handleResize();
   }
@@ -89,7 +88,6 @@ class Image extends CloudinaryComponent {
   }
 
   componentDidUpdate(prevProps) {
-    console.log('test', this.element)
     this.setState(this.prepareState());
     if (this.state.responsive) {
       const wait = firstDefined(this.props.responsiveDebounce, this.getContext().responsiveDebounce, 100);
@@ -102,7 +100,7 @@ class Image extends CloudinaryComponent {
   }
 
   render() {
-    const { publicId, responsive, responsiveDebounce, children, ...options } =
+    const { publicId, responsive, responsiveDebounce, children, imageRef, ...options } =
       CloudinaryComponent.normalizeOptions(this.props, this.getContext());
     const attributes = cloudinary.Transformation.new(options).toHtmlAttributes();
     const { url } = this.state;
